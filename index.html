@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JashFramed — Curated Visual Archive</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <h1>JASHFRAMED</h1>
+      <p class="tagline">Stories through the lens — a curated visual archive.</p>
+    </div>
+
+    <nav class="filters" aria-label="Gallery categories">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="street">Street</button>
+      <button class="filter-btn" data-filter="landscape">Landscape</button>
+      <button class="filter-btn" data-filter="minimal">Minimal</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="gallery" id="gallery">
+      <!-- Swap image filenames, categories, titles, and camera specs with your own -->
+      <figure class="photo-card" data-category="street">
+        <img src="images/photo1.jpg" alt="Evening shadows along the avenue" loading="lazy" />
+        <figcaption>
+          <span class="photo-title">Evening Shadows</span>
+          <span class="photo-meta">50mm &bull; f/1.8 &bull; ISO 400</span>
+        </figcaption>
+      </figure>
+
+      <figure class="photo-card" data-category="landscape">
+        <img src="images/photo2.jpg" alt="First light breaking over misty ridges" loading="lazy" />
+        <figcaption>
+          <span class="photo-title">First Light</span>
+          <span class="photo-meta">24mm &bull; f/8 &bull; ISO 100</span>
+        </figcaption>
+      </figure>
+
+      <figure class="photo-card" data-category="minimal">
+        <img src="images/photo3.jpg" alt="Concrete lines against late afternoon sky" loading="lazy" />
+        <figcaption>
+          <span class="photo-title">Quiet Geometry</span>
+          <span class="photo-meta">35mm &bull; f/4 &bull; ISO 200</span>
+        </figcaption>
+      </figure>
+
+      <figure class="photo-card" data-category="street">
+        <img src="images/photo4.jpg" alt="Rain reflections on asphalt at dusk" loading="lazy" />
+        <figcaption>
+          <span class="photo-title">After the Downpour</span>
+          <span class="photo-meta">50mm &bull; f/2.0 &bull; ISO 800</span>
+        </figcaption>
+      </figure>
+
+      <figure class="photo-card" data-category="landscape">
+        <img src="images/photo5.jpg" alt="Calm coastline before sunrise" loading="lazy" />
+        <figcaption>
+          <span class="photo-title">Still Water</span>
+          <span class="photo-meta">28mm &bull; f/5.6 &bull; ISO 100</span>
+        </figcaption>
+      </figure>
+
+      <figure class="photo-card" data-category="minimal">
+        <img src="images/photo6.jpg" alt="Single beam of light across stairwell" loading="lazy" />
+        <figcaption>
+          <span class="photo-title">Light Study No. 4</span>
+          <span class="photo-meta">35mm &bull; f/2.8 &bull; ISO 320</span>
+        </figcaption>
+      </figure>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; <span id="year"></span> Jash &mdash; <a href="https://github.com/Jash21k" target="_blank" rel="noopener">GitHub</a> &bull; <a href="https://instagram.com/" target="_blank" rel="noopener">Instagram</a></p>
+  </footer>
+
+  <!-- Full-Screen Lightbox -->
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <button class="lb-close" id="lbClose" aria-label="Close viewer">&times;</button>
+    <button class="lb-nav lb-prev" id="lbPrev" aria-label="Previous photo">&#8249;</button>
+    <div class="lb-content">
+      <img id="lbImg" src="" alt="" />
+      <div class="lb-caption">
+        <h2 id="lbTitle"></h2>
+        <p id="lbMeta"></p>
+      </div>
+    </div>
+    <button class="lb-nav lb-next" id="lbNext" aria-label="Next photo">&#8250;</button>
+  </div>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    const filterButtons = document.querySelectorAll(".filter-btn");
+    const cards = Array.from(document.querySelectorAll(".photo-card"));
+
+    filterButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        filterButtons.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        const filter = btn.dataset.filter;
+
+        cards.forEach((card) => {
+          const match = filter === "all" || card.dataset.category === filter;
+          card.classList.toggle("hidden", !match);
+        });
+      });
+    });
+
+    const lightbox = document.getElementById("lightbox");
+    const lbImg = document.getElementById("lbImg");
+    const lbTitle = document.getElementById("lbTitle");
+    const lbMeta = document.getElementById("lbMeta");
+    let visibleCards = [];
+    let currentIndex = 0;
+
+    function openLightbox(index) {
+      visibleCards = cards.filter((c) => !c.classList.contains("hidden"));
+      currentIndex = index;
+      updateLightbox();
+      lightbox.classList.add("open");
+      lightbox.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove("open");
+      lightbox.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    function updateLightbox() {
+      const card = visibleCards[currentIndex];
+      const img = card.querySelector("img");
+      lbImg.src = img.src;
+      lbImg.alt = img.alt;
+      lbTitle.textContent = card.querySelector(".photo-title").textContent;
+      lbMeta.textContent = card.querySelector(".photo-meta").textContent;
+    }
+
+    cards.forEach((card) => {
+      card.addEventListener("click", () => {
+        const activeList = cards.filter((c) => !c.classList.contains("hidden"));
+        openLightbox(activeList.indexOf(card));
+      });
+    });
+
+    document.getElementById("lbClose").addEventListener("click", closeLightbox);
+    document.getElementById("lbPrev").addEventListener("click", () => {
+      currentIndex = (currentIndex - 1 + visibleCards.length) % visibleCards.length;
+      updateLightbox();
+    });
+    document.getElementById("lbNext").addEventListener("click", () => {
+      currentIndex = (currentIndex + 1) % visibleCards.length;
+      updateLightbox();
+    });
+
+    lightbox.addEventListener("click", (e) => {
+      if (e.target === lightbox) closeLightbox();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (!lightbox.classList.contains("open")) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") document.getElementById("lbPrev").click();
+      if (e.key === "ArrowRight") document.getElementById("lbNext").click();
+    });
+  </script>
+</body>
+</html>
